@@ -51,10 +51,10 @@ public class Lexer {
           tokens.add(new Token(TokenType.MULT, "*"));
           break;
         case '/':
-          tokens.add(new Token(TokenType.DIV, "*"));
+          tokens.add(new Token(TokenType.DIV, "/"));
           break;
         case '%':
-          tokens.add(new Token(TokenType.MOD, "*"));
+          tokens.add(new Token(TokenType.MOD, "%"));
           break;
         case '"':
           tokens.add(string(advance()));
