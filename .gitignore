@@ -1,0 +1,52 @@
+# Gradle build directories
+build
+out
+bin
+
+# Gradle dependency caches
+.gradle/
+/gradle/
+/**/.gradle/
+
+# Eclipse, IntelliJ IDEA, and VS Code settings
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.vscode/
+
+# Logs and temporary files
+*.log
+*.tmp
+hs_err_pid*
+*.swp
+*.swo
+
+# Compiled class files
+**/*.class
+**/*.jar
+**/*.war
+**/*.ear
+
+# Coverage and reports
+/coverage/
+/reports/
+/jacoco/
+
+# Maven-related (if the project also uses Maven)
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+dependency-reduced-pom.xml
+release.properties
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# User-specific files
+*.~*
+
