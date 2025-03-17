@@ -1,11 +1,11 @@
 package lexer;
 
 public enum TokenType {
-  VAR, FUN, IF, ELSE, RETURN,
+  VAR, FUNC, IF, ELSE, RETURN,
 
-  ID, NUMBER, STRING,
+  IDENTIFIER, NUMBER, STRING,
 
-  PLUS, MINUS, MULT, DIV, MOD,
+  PLUS, MINUS, MULT, DIV, MOD, ASSIGN,
 
   LE, GE, LT, GT, EQ, NE,
 
