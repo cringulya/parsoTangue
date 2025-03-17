@@ -114,11 +114,14 @@ public class Lexer {
 
   private Token string(char c) {
     StringBuilder sb = new StringBuilder();
+    sb.append(c);
     boolean foundClosing = false;
     while (!isEOF() && input.charAt(pos) != '"') {
       sb.append(advance());
       if (!isEOF() && input.charAt(pos) == '"') {
         foundClosing = true;
+        advance();
+        break;
       }
     }
     if (!foundClosing) {
@@ -132,7 +135,7 @@ public class Lexer {
     sb.append(c);
     char next = advance();
     if (!isEOF() && next == '=') {
-      sb.append(c);
+      sb.append(next);
     }
     String lexeme = sb.toString();
     switch (lexeme) {
@@ -151,7 +154,7 @@ public class Lexer {
       case "!=":
         return new Token(TokenType.NE, lexeme);
       default:
-        throw new RuntimeException("Should not be reached");
+        throw new RuntimeException("Should not be reached, lexeme: " + lexeme);
     }
   }
 

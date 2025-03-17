@@ -18,5 +18,15 @@ public class IfNode extends ASTNode {
   @Override
   public void print(int indent) {
     printIndent(indent);
+    System.out.println("IF statement:");
+    printIndent(indent + 1);
+    System.out.println("CONDITION:");
+    condition.print(indent + 2);
+    printIndent(indent + 1);
+    System.out.println("THEN BRANCH:");
+    thenBranch.print(indent + 2);
+    printIndent(indent + 1);
+    System.out.println("ELSE BRANCH:");
+    elseBranch.print(indent + 2);
   }
 }

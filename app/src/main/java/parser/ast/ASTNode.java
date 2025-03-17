@@ -5,6 +5,6 @@ public abstract class ASTNode {
 
   protected void printIndent(int indent) {
     for (int i = 0; i < indent; i++)
-      System.out.print("\t");
+      System.out.print("  ");
   }
 }

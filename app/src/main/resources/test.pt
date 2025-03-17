@@ -1,1 +1,13 @@
 var a = 1 + 2 + 3 * (4 * 5);
+
+var comp = (10 + 2 * 4) <= 4;
+
+func foo(a, b, c) {
+  return 69;
+}
+
+if (1 + 2) {
+  var c = 1;
+} else {
+  var d = "kekis";
+}
