@@ -117,7 +117,7 @@ public class Lexer {
     boolean foundClosing = false;
     while (!isEOF() && input.charAt(pos) != '"') {
       sb.append(advance());
-      if (input.charAt(pos) == '"') {
+      if (!isEOF() && input.charAt(pos) == '"') {
         foundClosing = true;
       }
     }

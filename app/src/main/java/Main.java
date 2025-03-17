@@ -1,8 +1,11 @@
 import java.util.List;
+
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import lexer.*;
+import parser.*;
+import parser.ast.ASTNode;
 
 public class Main {
 
@@ -16,9 +19,9 @@ public class Main {
       String input = new String(is.readAllBytes(), StandardCharsets.UTF_8);
       Lexer lexer = new Lexer(input);
       List<Token> tokens = lexer.tokenize();
-      for (Token tok : tokens) {
-        System.out.println(tok.toString());
-      }
+      Parser parser = new Parser(tokens);
+      ASTNode ast = parser.parse();
+      ast.print(0);
     } catch (Exception e) {
       e.printStackTrace();
     }
