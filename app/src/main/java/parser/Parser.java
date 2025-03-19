@@ -62,7 +62,8 @@ public class Parser {
           consume(TokenType.SEMICOLON, "expecting ;");
           return assign;
         } catch (Exception e2) {
-          throw e1;
+          this.pos = init_pos;
+          throw error(peek(), e1.toString() + "\n" + e2.toString());
         }
       }
     }
@@ -74,7 +75,7 @@ public class Parser {
     Token id = consume(TokenType.IDENTIFIER, "expecting identifier");
     consume(TokenType.ASSIGN, "expecting =");
     ASTNode expr = parseExpression();
-    return new AssignmentNode(id.toString(), expr);
+    return new AssignmentNode(id.lexeme, expr);
   }
 
   private ASTNode parseIfStatement() {
@@ -161,23 +162,23 @@ public class Parser {
         check(TokenType.LE) || check(TokenType.GE)) {
       Token op = advance();
       ASTNode right = parseTerm();
-      left = new BinaryExpression(left, op.toString(), right);
+      left = new BinaryExpression(left, op.lexeme, right);
     }
 
     while (check(TokenType.PLUS) || check(TokenType.MINUS)) {
       Token op = advance();
       ASTNode right = parseTerm();
-      left = new BinaryExpression(left, op.toString(), right);
+      left = new BinaryExpression(left, op.lexeme, right);
     }
     return left;
   }
 
   private ASTNode parseTerm() {
     ASTNode left = parseFactor();
-    if (check(TokenType.MULT) || check(TokenType.DIV) || check(TokenType.MOD)) {
+    while (check(TokenType.MULT) || check(TokenType.DIV) || check(TokenType.MOD)) {
       Token op = advance();
       ASTNode right = parseFactor();
-      return new BinaryExpression(left, op.toString(), right);
+      left = new BinaryExpression(left, op.lexeme, right);
     }
     return left;
   }

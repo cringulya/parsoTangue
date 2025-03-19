@@ -1,6 +1,7 @@
 package parser.ast;
 
 import java.util.List;
+import java.util.Objects;
 
 public class FunctionDeclarationNode extends ASTNode {
   public final String identefier;
@@ -16,7 +17,7 @@ public class FunctionDeclarationNode extends ASTNode {
   @Override
   public void print(int indent) {
     printIndent(indent);
-    System.out.println("Function declaration (" + identefier + ")"); 
+    System.out.println("Function declaration (" + identefier + ")");
     printIndent(indent + 1);
     System.out.println("Parameters:");
     for (ASTNode param : parameters) {
@@ -25,5 +26,17 @@ public class FunctionDeclarationNode extends ASTNode {
     printIndent(indent + 1);
     System.out.println("Body:");
     body.print(indent + 2);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null || getClass() != obj.getClass())
+      return false;
+    FunctionDeclarationNode other = (FunctionDeclarationNode) obj;
+    return Objects.equals(identefier, other.identefier)
+        && Objects.equals(parameters, other.parameters)
+        && Objects.equals(body, other.body);
   }
 }
