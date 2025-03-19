@@ -16,7 +16,7 @@ public class FunctionDeclarationNode extends ASTNode {
   @Override
   public void print(int indent) {
     printIndent(indent);
-    System.out.println("Function declaration:");
+    System.out.println("Function declaration (" + identefier + ")"); 
     printIndent(indent + 1);
     System.out.println("Parameters:");
     for (ASTNode param : parameters) {

@@ -5,14 +5,18 @@ import java.util.List;
 import lexer.Token;
 import lexer.TokenType;
 import parser.ast.ASTNode;
+import parser.ast.AssignmentNode;
 import parser.ast.BinaryExpression;
 import parser.ast.BlockNode;
 import parser.ast.ComparisonExpression;
+import parser.ast.FunctionCallNode;
 import parser.ast.FunctionDeclarationNode;
+import parser.ast.FunctionParameter;
 import parser.ast.IfNode;
 import parser.ast.LiteralNode;
 import parser.ast.ReturnStatement;
 import parser.ast.VarDeclarationNode;
+import parser.ast.VarType;
 
 public class Parser {
   private final List<Token> tokens;
@@ -29,7 +33,7 @@ public class Parser {
   private BlockNode parseBlock() {
     List<ASTNode> instructions = new ArrayList<>();
     while (!end() && !check(TokenType.RBRACE)) {
-      if (check(TokenType.VAR) || check(TokenType.FUNC)) {
+      if (check(TokenType.INT) || check(TokenType.STR) || check(TokenType.FUNC)) {
         instructions.add(parseDeclaration());
       } else if (match(TokenType.RETURN)) {
         ASTNode expr = parseExpression();
@@ -46,9 +50,33 @@ public class Parser {
   private ASTNode parseStatement() {
     if (match(TokenType.IF)) {
       return parseIfStatement();
+    } else if (check(TokenType.IDENTIFIER)) {
+      int init_pos = this.pos;
+      try {
+        ASTNode call = parseFunctionCall();
+        consume(TokenType.SEMICOLON, "expecting ;");
+        return call;
+      } catch (Exception e1) {
+        try {
+          this.pos = init_pos;
+          ASTNode assign = parseAssignStatement();
+          consume(TokenType.SEMICOLON, "expecting ;");
+          return assign;
+        } catch (Exception e2) {
+          throw e1;
+          // throw error(peek(), "couldn't parse statement");
+        }
+      }
     }
 
-    throw new RuntimeException("not implemented, found: " + peek());
+    throw error(peek(), "not implemented");
+  }
+
+  private ASTNode parseAssignStatement() {
+    Token id = consume(TokenType.IDENTIFIER, "expecting identifier");
+    consume(TokenType.ASSIGN, "expecting =");
+    ASTNode expr = parseExpression();
+    return new AssignmentNode(id.toString(), expr);
   }
 
   private ASTNode parseIfStatement() {
@@ -68,12 +96,12 @@ public class Parser {
   }
 
   private ASTNode parseDeclaration() {
-    if (match(TokenType.VAR)) {
+    if (check(TokenType.INT) || check(TokenType.STR)) {
       return parseVarDeclaration();
     } else if (match(TokenType.FUNC)) {
       return parseFunctionDeclaration();
     }
-    throw new RuntimeException("not implemented");
+    throw error(peek(), "not implemented");
   }
 
   private ASTNode parseFunctionDeclaration() {
@@ -81,22 +109,50 @@ public class Parser {
     consume(TokenType.LPAREN, "expecting (");
     List<ASTNode> parameters = new ArrayList<>();
     while (!match(TokenType.RPAREN)) {
-      Token param = consume(TokenType.IDENTIFIER, "expecting identifier");
-      parameters.add(new LiteralNode(param.toString()));
+      if (match(TokenType.STRING)) {
+        Token name = consume(TokenType.IDENTIFIER, "expecting parameter identifier");
+        parameters.add(new FunctionParameter(name.lexeme, VarType.STRING));
+      } else if (match(TokenType.INT)) {
+        Token name = consume(TokenType.IDENTIFIER, "expecting parameter identifier");
+        parameters.add(new FunctionParameter(name.lexeme, VarType.INTEGER));
+      }
       match(TokenType.COMMA);
     }
     consume(TokenType.LBRACE, "expecting {");
     ASTNode body = parseBlock();
     consume(TokenType.RBRACE, "expecting }");
-    return new FunctionDeclarationNode(identifier.toString(), parameters, body);
+    return new FunctionDeclarationNode(identifier.lexeme, parameters, body);
+  }
+
+  private ASTNode parseFunctionCall() {
+    Token id = consume(TokenType.IDENTIFIER, "expecting function identifier");
+    consume(TokenType.LPAREN, "expecting (");
+
+    List<ASTNode> arguments = new ArrayList<>();
+    while (!match(TokenType.RPAREN)) {
+      ASTNode expr = parseExpression();
+      arguments.add(expr);
+      match(TokenType.COMMA);
+    }
+
+    return new FunctionCallNode(id.lexeme, arguments);
+
   }
 
   private ASTNode parseVarDeclaration() {
+    VarType type;
+    if (match(TokenType.INT)) {
+      type = VarType.INTEGER;
+    } else if (match(TokenType.STR)) {
+      type = VarType.STRING;
+    } else {
+      throw error(peek(), "expecting a type");
+    }
     Token identifier = consume(TokenType.IDENTIFIER, "expecting variable name");
     consume(TokenType.ASSIGN, "expecting =");
     ASTNode expression = parseExpression();
     consume(TokenType.SEMICOLON, "expecting ;");
-    return new VarDeclarationNode(identifier.toString(), expression);
+    return new VarDeclarationNode(identifier.lexeme, type, expression);
   }
 
   private ASTNode parseExpression() {
@@ -130,15 +186,34 @@ public class Parser {
 
   private ASTNode parseFactor() {
     if (check(TokenType.NUMBER) || check(TokenType.STRING) || check(TokenType.IDENTIFIER)) {
-      Token tok = advance();
-      return new LiteralNode(tok.toString());
+      return parseLiteral();
     } else if (match(TokenType.LPAREN)) {
       ASTNode expr = parseExpression();
       consume(TokenType.RPAREN, "expecting )");
       return expr;
     } else {
-      throw new RuntimeException("[Error] unexpected token: " + peek());
+      throw error(peek(), "unexpected token");
     }
+  }
+
+  private ASTNode parseLiteral() {
+    if (check(TokenType.NUMBER)) {
+      Token tok = advance();
+      return new LiteralNode(
+          Integer.parseInt(tok.lexeme),
+          VarType.INTEGER);
+    } else if (check(TokenType.STRING)) {
+      Token tok = advance();
+      return new LiteralNode(
+          tok.lexeme,
+          VarType.STRING);
+    } else if (check(TokenType.IDENTIFIER)) {
+      Token tok = advance();
+      return new LiteralNode(
+          tok.lexeme,
+          VarType.REFERENCE);
+    }
+    throw error(peek(), "unexpected token");
   }
 
   private boolean match(TokenType type) {
@@ -152,7 +227,7 @@ public class Parser {
   private Token consume(TokenType type, String message) {
     if (check(type))
       return advance();
-    throw error(peek(), "[Error] " + message);
+    throw error(peek(), message);
   }
 
   private boolean check(TokenType type) {
@@ -176,7 +251,7 @@ public class Parser {
   }
 
   private RuntimeException error(Token token, String message) {
-    return new RuntimeException("Error at token " + token.lexeme + ": " + message);
+    return new RuntimeException("[Parser Error] line:" + token.line + " at token \"" + token.lexeme + "\": " + message);
   }
 
 }

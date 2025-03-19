@@ -6,6 +6,7 @@ import java.util.List;
 public class Lexer {
   private final String input;
   private int pos = 0;
+  private int line = 1;
 
   public Lexer(String input) {
     this.input = input;
@@ -18,43 +19,45 @@ public class Lexer {
       char cur = advance();
 
       switch (cur) {
-        case ' ':
         case '\n':
+          this.line++;
+          break;
+        case ' ':
         case '\t':
           break;
 
         case '(':
-          tokens.add(new Token(TokenType.LPAREN, "("));
+          tokens.add(token(TokenType.LPAREN, "("));
           break;
         case ')':
-          tokens.add(new Token(TokenType.RPAREN, ")"));
+          tokens.add(token(TokenType.RPAREN, ")"));
           break;
         case '{':
-          tokens.add(new Token(TokenType.LBRACE, "{"));
+          tokens.add(token(TokenType.LBRACE, "{"));
           break;
         case '}':
-          tokens.add(new Token(TokenType.RBRACE, "}"));
+          tokens.add(token(TokenType.RBRACE, "}"));
           break;
         case ';':
-          tokens.add(new Token(TokenType.SEMICOLON, ";"));
+          tokens.add(token(TokenType.SEMICOLON, ";"));
           break;
         case ',':
-          tokens.add(new Token(TokenType.COMMA, ","));
+          tokens.add(token(TokenType.COMMA, ","));
           break;
         case '+':
-          tokens.add(new Token(TokenType.PLUS, "+"));
+          tokens.add(token(TokenType.PLUS, "+"));
           break;
         case '-':
-          tokens.add(new Token(TokenType.MINUS, "-"));
+          tokens.add(token(TokenType.MINUS, "-"));
           break;
         case '*':
-          tokens.add(new Token(TokenType.MULT, "*"));
+          tokens.add(token(TokenType.MULT, "*"));
           break;
         case '/':
-          tokens.add(new Token(TokenType.DIV, "/"));
+          tokens.add(token(TokenType.DIV, "/"));
           break;
         case '%':
-          tokens.add(new Token(TokenType.MOD, "%"));
+          tokens.add(token(TokenType.MOD, "%"));
           break;
         case '"':
           tokens.add(string(advance()));
@@ -75,7 +78,7 @@ public class Lexer {
       }
     }
 
-    tokens.add(new Token(TokenType.EOF, "\0"));
+    tokens.add(token(TokenType.EOF, "\0"));
     return tokens;
   }
 
@@ -85,7 +88,7 @@ public class Lexer {
     while (!isEOF() && Character.isDigit(input.charAt(pos))) {
       sb.append(advance());
     }
-    return new Token(TokenType.NUMBER, sb.toString());
+    return token(TokenType.NUMBER, sb.toString());
   }
 
   private Token identifier(char c) {
@@ -97,18 +100,20 @@ public class Lexer {
 
     String lexeme = sb.toString();
     switch (lexeme) {
-      case "var":
-        return new Token(TokenType.VAR, lexeme);
+      case "int":
+        return token(TokenType.INT, lexeme);
+      case "str":
+        return token(TokenType.STR, lexeme);
       case "func":
-        return new Token(TokenType.FUNC, lexeme);
+        return token(TokenType.FUNC, lexeme);
       case "if":
-        return new Token(TokenType.IF, lexeme);
+        return token(TokenType.IF, lexeme);
       case "else":
-        return new Token(TokenType.ELSE, lexeme);
+        return token(TokenType.ELSE, lexeme);
       case "return":
-        return new Token(TokenType.RETURN, lexeme);
+        return token(TokenType.RETURN, lexeme);
       default:
-        return new Token(TokenType.IDENTIFIER, lexeme);
+        return token(TokenType.IDENTIFIER, lexeme);
     }
   }
 
@@ -127,7 +132,7 @@ public class Lexer {
     if (!foundClosing) {
       throw new RuntimeException("[Error]: No closing \" found");
     }
-    return new Token(TokenType.STRING, sb.toString());
+    return token(TokenType.STRING, sb.toString());
   }
 
   private Token comparison(char c) {
@@ -140,22 +145,26 @@ public class Lexer {
     String lexeme = sb.toString();
     switch (lexeme) {
       case "<":
-        return new Token(TokenType.LT, lexeme);
+        return token(TokenType.LT, lexeme);
       case ">":
-        return new Token(TokenType.GT, lexeme);
+        return token(TokenType.GT, lexeme);
       case "=":
-        return new Token(TokenType.ASSIGN, lexeme);
+        return token(TokenType.ASSIGN, lexeme);
       case "==":
-        return new Token(TokenType.EQ, lexeme);
+        return token(TokenType.EQ, lexeme);
       case "<=":
-        return new Token(TokenType.LE, lexeme);
+        return token(TokenType.LE, lexeme);
       case ">=":
-        return new Token(TokenType.GE, lexeme);
+        return token(TokenType.GE, lexeme);
       case "!=":
-        return new Token(TokenType.NE, lexeme);
+        return token(TokenType.NE, lexeme);
       default:
         throw new RuntimeException("Should not be reached, lexeme: " + lexeme);
     }
+  }
+
+  private Token token(TokenType type, String lexeme) {
+    return new Token(type, lexeme, this.line);
   }
 
   private char advance() {

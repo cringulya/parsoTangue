@@ -1,13 +1,21 @@
-var a = 1 + 2 + 3 * (4 * 5);
+int a = 1 + 2 + 3 * (4 * 5);
 
-var comp = (10 + 2 * 4) <= 4;
+int comp = (10 + 2 * 4) <= 4;
 
-func foo(a, b, c) {
+func foo(int a, int b, int c) {
   return 69;
 }
 
 if (1 != 2 % 5) {
-  var c = 1;
+  int c = 1;
 } else {
-  var d = "kekis";
+  str d = "kekis";
 }
+
+if (1) {
+  return 2;
+}
+
+foo(a, "kek", 1);
+
+a = 2;

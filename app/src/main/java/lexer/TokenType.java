@@ -1,7 +1,9 @@
 package lexer;
 
 public enum TokenType {
-  VAR, FUNC, IF, ELSE, RETURN,
+  FUNC, IF, ELSE, RETURN,
+
+  INT, STR,
 
   IDENTIFIER, NUMBER, STRING,
 
