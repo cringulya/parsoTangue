@@ -22,6 +22,6 @@ class ParserTests {
     List<Token> tokens = lexer.tokenize();
     Parser parser = new Parser(tokens);
     ASTNode ast = parser.parse();
-    assertEquals(ast, new BlockNode(new ArrayList<>()), "kek");
+    assertEquals(((BlockNode)ast).instructions, new ArrayList<>());
   }
 }

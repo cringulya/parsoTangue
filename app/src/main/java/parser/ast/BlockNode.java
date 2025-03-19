@@ -7,7 +7,7 @@ import java.util.List;
  * BlockNode
  */
 public class BlockNode extends ASTNode {
-  List<ASTNode> instructions;
+  public List<ASTNode> instructions;
 
   public BlockNode(List<ASTNode> statements) {
     this.instructions = statements;
