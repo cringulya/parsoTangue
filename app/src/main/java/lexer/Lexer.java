@@ -94,7 +94,7 @@ public class Lexer {
   private Token identifier(char c) {
     StringBuilder sb = new StringBuilder();
     sb.append(c);
-    while (!isEOF() && Character.isLetterOrDigit(input.charAt(pos))) {
+    while (!isEOF() && (Character.isLetterOrDigit(input.charAt(pos)) || input.charAt(pos) == '_')) {
       sb.append(advance());
     }
 

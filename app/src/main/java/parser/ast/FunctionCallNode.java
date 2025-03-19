@@ -14,7 +14,7 @@ public class FunctionCallNode extends ASTNode {
   @Override
   public void print(int indent) {
     printIndent(indent);
-    System.out.println("Function call:");
+    System.out.println("Function call (" + identefier + ")");
     printIndent(indent + 1);
     System.out.println("Arguments:");
     for (ASTNode param : arguments) {

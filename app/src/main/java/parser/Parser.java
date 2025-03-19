@@ -8,7 +8,6 @@ import parser.ast.ASTNode;
 import parser.ast.AssignmentNode;
 import parser.ast.BinaryExpression;
 import parser.ast.BlockNode;
-import parser.ast.ComparisonExpression;
 import parser.ast.FunctionCallNode;
 import parser.ast.FunctionDeclarationNode;
 import parser.ast.FunctionParameter;
@@ -63,7 +62,7 @@ public class Parser {
           consume(TokenType.SEMICOLON, "expecting ;");
           return assign;
         } catch (Exception e2) {
-          throw error(peek(), "couldn't parse statement");
+          throw e1;
         }
       }
     }
@@ -185,6 +184,15 @@ public class Parser {
 
   private ASTNode parseFactor() {
     if (check(TokenType.NUMBER) || check(TokenType.STRING) || check(TokenType.IDENTIFIER)) {
+      if (check(TokenType.IDENTIFIER)) {
+        int init_pos = this.pos;
+        try {
+          return parseFunctionCall();
+        } catch (Exception e) {
+          this.pos = init_pos;
+          return parseLiteral();
+        }
+      }
       return parseLiteral();
     } else if (match(TokenType.LPAREN)) {
       ASTNode expr = parseExpression();

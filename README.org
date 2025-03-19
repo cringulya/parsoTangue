@@ -1,6 +1,5 @@
 * ParsoTangue
 
-
 ** Запуск
 Зависимости:
 - Java 21
@@ -45,7 +44,7 @@
 Вершинами дерева могут быть:
 - Объявление переменной
 - Присваивание переменной
-- Бинароное выражение
+- Бинарное выражение
 - Блок. Список объявлений и инструкций 
 - Объявление функции
 - Вызов функции
@@ -56,8 +55,7 @@
 ** Спецификация
 Поддерживаются целые числа и строки ~int, string~.
 
-- Арифметические операции: сложение (+), вычитание (-), умножение (*), 
-деление (/), деление с остатком (%)
+- Арифметические операции: сложение (+), вычитание (-), умножение (*), деление (/), деление с остатком (%)
 
 - Операции сравнения: <=, >=, <, >, ==, !=.
 
@@ -67,14 +65,18 @@
 выражение
 
 ~<type> -> int | str~
+
 ~<identifier> -> [a-zA-Z][a-zA-Z0-9]*~
+
 ~<var_declaration> -> <type> <identifier> = <expression> ;~
 
 *** Выражения
 
 ~<expression> -> <term> (("+" | "-" | "<" | "<=" | ">" | ">=" | "==" | "!=") <term>)*~
+
 ~<term> -> <factor> (("*" | "/" | "%") <factor>)*~
-~<factor> -> <literal> | "(" <expression> ")"~
+
+~<factor> -> <literal> | <function_call> | "(" <expression> ")"~
 
 Литерал может быть числом, строкой или именем переменной.
 
@@ -84,9 +86,13 @@
 Вся программа это блок. Список объявлений и инструкций. 
 
 ~<block> -> <statements> <declarations>~
-~<declarations> -> <declaration> | <declaration> <declarations> | $\varepsilon$~
+
+~<declarations> -> <declaration> | <declaration> <declarations> | <\epsilon>~
+
 ~<declaration> -> <var_declaration> | <function_declaration>~
-~<statements> -> <statement> | <statement> <statements> | $\varepsilon$~
+
+~<statements> -> <statement> | <statement> <statements> | <\epsilon>~
+
 ~<statement> -> <var_assign> ; | <function_call>~
 
 *** Объявление функции
@@ -102,13 +108,17 @@ func foo(int a, int b) {
 #+end_src
 
 ~<parameter> -> <type> <identifier>~
-~<parameter_list> -> <parameter> | <parameter>, <parameter_list> | $\varepsilon$~ 
+
+~<parameter_list> -> <parameter> | <parameter>, <parameter_list> | <\epsilon>~ 
+
 ~<function_declaration> -> func <identifier> ( <parameter_list> ) { <block> }~
 
 *** Вызов функции
 
 ~<argument> -> <expression>~
-~<argument_list> -> <argument> | <argument>, <argument_list> | $\varepsilon$~ 
+
+~<argument_list> -> <argument> | <argument>, <argument_list> | <\epsilon>~ 
+
 ~<function_call> -> <identifier> ( <argument_list> )~
 
 *** Присваивание переменной
