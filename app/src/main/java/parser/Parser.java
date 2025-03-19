@@ -63,8 +63,7 @@ public class Parser {
           consume(TokenType.SEMICOLON, "expecting ;");
           return assign;
         } catch (Exception e2) {
-          throw e1;
-          // throw error(peek(), "couldn't parse statement");
+          throw error(peek(), "couldn't parse statement");
         }
       }
     }
@@ -163,7 +162,7 @@ public class Parser {
         check(TokenType.LE) || check(TokenType.GE)) {
       Token op = advance();
       ASTNode right = parseTerm();
-      left = new ComparisonExpression(left, op.toString(), right);
+      left = new BinaryExpression(left, op.toString(), right);
     }
 
     while (check(TokenType.PLUS) || check(TokenType.MINUS)) {

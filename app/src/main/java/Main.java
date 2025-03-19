@@ -10,10 +10,15 @@ import parser.ast.ASTNode;
 public class Main {
 
   public static void main(String[] args) {
+    String file = "test.pt";
+    if (args.length > 0) {
+      file = args[0];
+    }
+
     try {
-      InputStream is = Main.class.getClassLoader().getResourceAsStream("test.pt");
+      InputStream is = Main.class.getClassLoader().getResourceAsStream(file);
       if (is == null) {
-        System.err.println("File not found in resources!");
+        System.err.println("[Error] File not found in resources! (src/main/resources)");
         return;
       }
       String input = new String(is.readAllBytes(), StandardCharsets.UTF_8);

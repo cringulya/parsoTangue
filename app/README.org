@@ -1,0 +1,123 @@
+* ParsoTangue
+
+
+** Запуск
+Зависимости:
+- Java 21
+- Gradle
+
+#+begin_src sh
+./gradlew run
+./gradlew run --args '<filename>'
+#+end_src
+
+Входной файл ищется в директории ~src/main/resources~
+
+При запуске без аргументов запускается ~test.pt~
+
+Для запуска тестов, но их не много...
+#+begin_src sh
+./gradlew test
+#+end_src
+
+** Что происходит
+Лексер получает на вход файл на языке ParsoTangue
+
+Бьет его на токены:
+#+begin_src txt
+  FUNC, IF, ELSE, RETURN,
+
+  INT, STR,
+
+  IDENTIFIER, NUMBER, STRING,
+
+  PLUS, MINUS, MULT, DIV, MOD, ASSIGN,
+
+  LE, GE, LT, GT, EQ, NE,
+
+  SEMICOLON, COMMA, LPAREN, RPAREN, LBRACE, RBRACE,
+
+  EOF
+#+end_src
+
+Парсер получает на вход строку токенов и строит синтаксическое дерево.
+
+Вершинами дерева могут быть:
+- Объявление переменной
+- Присваивание переменной
+- Бинароное выражение
+- Блок. Список объявлений и инструкций 
+- Объявление функции
+- Вызов функции
+- Параметры функции
+- Условное ветвление
+
+
+** Спецификация
+Поддерживаются целые числа и строки ~int, string~.
+
+- Арифметические операции: сложение (+), вычитание (-), умножение (*), 
+деление (/), деление с остатком (%)
+
+- Операции сравнения: <=, >=, <, >, ==, !=.
+
+*** Объявление переменных
+
+По ключевому слову "int", "str", после ожидается оператор присваивания и
+выражение
+
+~<type> -> int | str~
+~<identifier> -> [a-zA-Z][a-zA-Z0-9]*~
+~<var_declaration> -> <type> <identifier> = <expression> ;~
+
+*** Выражения
+
+~<expression> -> <term> (("+" | "-" | "<" | "<=" | ">" | ">=" | "==" | "!=") <term>)*~
+~<term> -> <factor> (("*" | "/" | "%") <factor>)*~
+~<factor> -> <literal> | "(" <expression> ")"~
+
+Литерал может быть числом, строкой или именем переменной.
+
+~<literal> -> NUMBER | STRING | <identifier>~
+
+*** Блок
+Вся программа это блок. Список объявлений и инструкций. 
+
+~<block> -> <statements> <declarations>~
+~<declarations> -> <declaration> | <declaration> <declarations> | $\varepsilon$~
+~<declaration> -> <var_declaration> | <function_declaration>~
+~<statements> -> <statement> | <statement> <statements> | $\varepsilon$~
+~<statement> -> <var_assign> ; | <function_call>~
+
+*** Объявление функции
+Объявляется по ключевому слову "func"
+
+Представляет из себя список параметров и блок.
+
+Пример:
+#+begin_src txt
+func foo(int a, int b) {
+  return 0;
+}
+#+end_src
+
+~<parameter> -> <type> <identifier>~
+~<parameter_list> -> <parameter> | <parameter>, <parameter_list> | $\varepsilon$~ 
+~<function_declaration> -> func <identifier> ( <parameter_list> ) { <block> }~
+
+*** Вызов функции
+
+~<argument> -> <expression>~
+~<argument_list> -> <argument> | <argument>, <argument_list> | $\varepsilon$~ 
+~<function_call> -> <identifier> ( <argument_list> )~
+
+*** Присваивание переменной
+
+~<var_assign> -> <identifier> = <expression>~
+
+*** Условный оператор
+
+~<if_statement> -> if (<expression>) { <block> } else { <block> } | if (<expression>) { <block> }~
+
+
+
